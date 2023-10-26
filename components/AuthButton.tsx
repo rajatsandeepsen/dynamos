@@ -1,21 +1,21 @@
-import { createClient } from '@/utils/supabase/server'
+import { supabase } from '@/utils/supabase/client'
 import Link from 'next/link'
+import useSWR from 'swr'
 
-export default async function AuthButton() {
-  const supabase = createClient()
+export default function AuthButton() {
+  const {data, error} = useSWR('user', () => supabase.auth.getUser())
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  function handleLogout() {
+    supabase.auth.signOut()
+  }
+  
 
-  return user ? (
+  return data?.data.user ? (
     <div className="flex items-center gap-4">
-      Hey, {user.email}!
-      <form action="/auth/sign-out" method="post">
-        <button className="py-2 px-4 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover">
+      Hey, {data.data.user.email}!
+        <button onClick={handleLogout} className="py-2 px-4 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover">
           Logout
         </button>
-      </form>
     </div>
   ) : (
     <Link

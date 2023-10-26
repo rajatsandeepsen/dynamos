@@ -1,9 +1,13 @@
-import './globals.css'
+"use client"
 
-export const metadata = {
-  title: 'Next.js and Supabase Starter Kit',
-  description: 'The fastest way to build apps with Next.js and Supabase',
-}
+import AuthButton from '@/components/AuthButton'
+import './globals.css'
+import Navbar from '@/components/Navbar'
+
+// export const metadata = {
+//   title: 'Dynamos',
+//   description: '',
+// }
 
 export default function RootLayout({
   children,
@@ -13,8 +17,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-background text-foreground">
-        <main className="min-h-screen flex flex-col items-center">
+        <main className="min-h-screen flex flex-col justify-start">
+        <Navbar/>
           {children}
+
+          <footer className="w-full mt-auto border-t border-t-foreground/10 p-8 flex justify-center text-center text-xs">
+          <p>
+            Built by{' '}
+            <a
+              href="https://twitter.com/rajatsandeepsen"
+              target="_blank"
+              className="font-bold hover:underline"
+              rel="noreferrer"
+            >
+              @rajatsandeepsen
+            </a>
+          </p>
+        </footer>
         </main>
       </body>
     </html>
