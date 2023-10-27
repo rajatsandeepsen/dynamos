@@ -1,7 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton"
-import React from "react";
+import {useEffect} from "react";
 import { useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -10,10 +10,12 @@ import {
 
 import SortableItem from "./self-items";
 import { Card, CardContent, CardHeader } from "../ui/card"
+import { getLogo } from "./team-items";
+import { useSelfTaskWhole } from "@/lib/self";
 
 type ItemsProps = {
-  id:string
-  items: any[]
+  id:Progress
+  items: string[]
 }
 
 export default function Container(props: ItemsProps) {
@@ -23,6 +25,13 @@ export default function Container(props: ItemsProps) {
     id,
   });
 
+  useEffect(() => {
+    localStorage.setItem(id, JSON.stringify(items))
+  
+    return () => { }
+  }, [items])
+  
+
   return (
     <SortableContext
       id={id}
@@ -31,7 +40,8 @@ export default function Container(props: ItemsProps) {
     >
       <Card className="break-inside-avoid" ref={setNodeRef}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          backlog {items.length}
+          {getLogo(id)}
+          {id.charAt(0).toUpperCase() + id.slice(1)} {items.length}
         </CardHeader>
 
         <CardContent  className="flex flex-col gap-1 p-2 flex-nowrap">
@@ -39,7 +49,7 @@ export default function Container(props: ItemsProps) {
                 <Skeleton className="w-full h-[20px]" />
             )}
             {items.map((id) => (
-                <SortableItem key={id} id={id} />
+                <SortableItem key={id} id={id}  />
             ))}
         </CardContent>
       </Card>
