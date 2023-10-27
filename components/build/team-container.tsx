@@ -11,7 +11,7 @@ import {
 import SortableItem from "./team-items";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useTaskStore } from "@/lib/task";
+import { useTaskStore, useTeamStore } from "@/lib/task";
 
 type ItemsProps = {
   id: string
@@ -20,10 +20,16 @@ type ItemsProps = {
 export default function Container(props: ItemsProps) {
   const { id, items } = props;
   const [tasks] = useTaskStore(state => [state.task])
+  const [teamData] = useTeamStore((state) => [
+    state.team,
+  ]);
+
 
   const { setNodeRef } = useDroppable({
     id,
   });
+
+  const data = teamData.find(e => e.id === id)
 
   return (
     <SortableContext
@@ -39,15 +45,13 @@ export default function Container(props: ItemsProps) {
               <AvatarFallback>OM</AvatarFallback>
             </Avatar>
             <div className="ml-4 space-y-1">
-              <p className="text-sm font-medium leading-none">Olivia Martin</p>
-              <p className="text-sm text-muted-foreground">
-                olivia.martin@email.com
-              </p>
+              <p className="text-base font-semibold">{data?.name}</p>
+              <p className="text-sm text-muted-foreground"> {data?.id} </p>
             </div>
           </div>
         </CardHeader>
 
-        <CardContent  className="flex flex-col gap-1 p-2 flex-nowrap">
+        <CardContent  className="flex flex-col gap-2 p-2 flex-nowrap">
             {items.length === 0 && (
                 <Skeleton className="w-full h-[20px]" />
             )}
@@ -74,10 +78,8 @@ export function UnAssigned(props: ItemsProps) {
       items={items}
       strategy={verticalListSortingStrategy}
     >
-        <CardContent  className="flex flex-col gap-1 p-2 flex-nowrap" ref={setNodeRef}>
-            {items.length === 0 && (
-                <Skeleton className="w-full h-[20px]" />
-            )}
+        <CardContent  className="flex flex-col gap-3 p-2 flex-nowrap" ref={setNodeRef}>
+            {items.length === 0 && ( <div className="px-4">No task</div> )}
             {items.map((item) => (
                 <SortableItem key={item} id={item} item={tasks.find(e=> e.id=== item) as Task} />
             ))}

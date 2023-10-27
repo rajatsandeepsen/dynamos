@@ -13,3 +13,9 @@ type TeamMember = {
     name: string
     tasks: Task[]
 }
+
+type Content = string
+
+type EachMember = {
+  [k:string]: Content[]
+}

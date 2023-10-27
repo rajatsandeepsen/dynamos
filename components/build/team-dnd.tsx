@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -12,7 +12,7 @@ import {
   DragStartEvent,
   DragOverEvent,
   DragEndEvent,
-  UniqueIdentifier
+  UniqueIdentifier,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
@@ -21,20 +21,14 @@ import { Item } from "./team-items";
 import { Card, CardFooter, CardHeader } from "../ui/card";
 import { NewTask } from "./new-task";
 import cuid from "cuid";
-import { useTaskStore, useTeamStore } from "@/lib/task";
-
-type Content = string
-
-type EachMember = {
-  [k:string]: Content[]
-}
-
+import { TeamWholeKeys, useTaskStore, useTeamState, useTeamStore } from "@/lib/task";
+import { zFilter } from "@/lib/zustand";
 
 const defaultAnnouncements = {
-  onDragStart(id:string) {
+  onDragStart(id: string) {
     console.log(`Picked up draggable item ${id}.`);
   },
-  onDragOver(id:string, overId:string) {
+  onDragOver(id: string, overId: string) {
     if (overId) {
       console.log(
         `Draggable item ${id} was moved over droppable area ${overId}.`
@@ -44,7 +38,7 @@ const defaultAnnouncements = {
 
     console.log(`Draggable item ${id} is no longer over a droppable area.`);
   },
-  onDragEnd(id:string, overId:string) {
+  onDragEnd(id: string, overId: string) {
     if (overId) {
       console.log(
         `Draggable item ${id} was dropped over droppable area ${overId}`
@@ -54,83 +48,68 @@ const defaultAnnouncements = {
 
     console.log(`Draggable item ${id} was dropped.`);
   },
-  onDragCancel(id:string) {
+  onDragCancel(id: string) {
     console.log(`Dragging was cancelled. Draggable item ${id} was dropped.`);
-  }
+  },
 };
 
 export default function Team() {
+  const [setTask] = useTaskStore((state) => [state.addTask]);
 
-  const [teams] = useTeamStore(state => [state.team])
-  const [tasks, setTask] = useTaskStore(state => [state.task, state.addTask])
+  const [items, setItems] = useTeamState((state) => {
+    const y = zFilter<TeamWholeKeys>(state, ["collection", "useState", "addState", "removeState"]);
 
-  const cal = {} as EachMember
-  (teams).forEach((e) => cal[e.id] = e.tasks.map(e => e.id))
-  
-  const [items, setItems] = useState<EachMember>({
-    unassigned: [],
-    ...cal
+    return [y, state.useState];
   });
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
+      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
-  useEffect(() => {
-
-    
-  
-    return () => {}
-  }, [])
-
-  function AddTask(text:string){
-    const id = cuid()
+  function AddTask(text: string) {
+    const id = cuid();
     const x = {
-      id, createdAt: Date.now().toString(),
-      progress: "todo", text, assigned: "unassigned"
-    } as Task
-    setItems((prev) => {
-      return { ...prev, unassigned: [ ...prev.unassigned, id ] }
-    })
+      id,
+      createdAt: Date.now().toString(),
+      progress: "todo",
+      text,
+      assigned: "unassigned",
+    } as Task;
+    setItems((prev) => ({ ...prev, unassigned: [...prev.unassigned, id] }));
 
-    setTask(x)
+    setTask(x);
   }
-  
 
   return (
-      <DndContext
-        accessibility={{announcements:defaultAnnouncements} as  any}
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="break-inside-avoid">
-          <Card className="mb-5 break-inside-avoid">
-            <CardHeader>
-              Unassigned Tasks
-            </CardHeader>
-            <UnAssigned id={"unassigned"} items={items.unassigned} />
-            <CardFooter>
-              <NewTask setTask={AddTask as any}/>
-            </CardFooter>
-          </Card>
-        </div>
+    <DndContext
+      accessibility={{ announcements: defaultAnnouncements } as any}
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="break-inside-avoid">
+        <Card className="mb-5 break-inside-avoid">
+          <CardHeader>Unassigned Tasks</CardHeader>
+          <UnAssigned id={"unassigned"} items={items.unassigned} />
+          <CardFooter>
+            <NewTask setTask={AddTask as any} />
+          </CardFooter>
+        </Card>
+      </div>
 
-        {Object.entries(items).map(([key, value]) => {
+      {Object.entries(items).map(([key, value]) => {
+        if (key === "unassigned") return null;
+        return <Container id={key} items={value} />;
+      })}
 
-          if(key === "unassigned") return null
-          return  <Container id={key} items={value}  />
-
-        })}
-
-        <DragOverlay>{activeId ? <Item id={activeId} /> : null}</DragOverlay>
-      </DndContext>
+      <DragOverlay>{activeId ? <Item id={activeId} /> : null}</DragOverlay>
+    </DndContext>
   );
 
   function findContainer(id: keyof EachMember) {
@@ -138,20 +117,22 @@ export default function Team() {
       return id;
     }
 
-    return Object.keys(items).find((key) => items[key as keyof EachMember].includes(id as never));
+    return Object.keys(items).find((key) =>
+      items[key as keyof EachMember].includes(id as never)
+    );
   }
 
-  function handleDragStart(event:DragStartEvent) {
+  function handleDragStart(event: DragStartEvent) {
     const { active } = event;
     const { id } = active;
 
     setActiveId(id as string);
   }
 
-  function handleDragOver(event:DragOverEvent) {
+  function handleDragOver(event: DragOverEvent) {
     const { active, over } = event;
-    const { id } = active as {id:string}
-    const { id:overId } = over as {id:string}
+    const { id } = active as { id: string };
+    const { id: overId } = over as { id: string };
 
     // Find the containers
     const activeContainer = findContainer(id);
@@ -179,9 +160,8 @@ export default function Team() {
         newIndex = overItems.length + 1;
       } else {
         const isBelowLastItem =
-          over &&
-          overIndex === overItems.length - 1 && true
-          // draggingRect?.offsetTop > over.rect.offsetTop + over.rect.height;
+          over && overIndex === overItems.length - 1 && true;
+        // draggingRect?.offsetTop > over.rect.offsetTop + over.rect.height;
 
         const modifier = isBelowLastItem ? 1 : 0;
 
@@ -191,21 +171,21 @@ export default function Team() {
       return {
         ...prev,
         [activeContainer]: [
-          ...prev[activeContainer].filter((item) => item !== active.id)
+          ...prev[activeContainer].filter((item) => item !== active.id),
         ],
         [overContainer]: [
           ...prev[overContainer].slice(0, newIndex),
           items[activeContainer][activeIndex],
-          ...prev[overContainer].slice(newIndex, prev[overContainer].length)
-        ]
+          ...prev[overContainer].slice(newIndex, prev[overContainer].length),
+        ],
       };
     });
   }
 
-  function handleDragEnd(event:DragEndEvent) {
+  function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     const { id } = active;
-    const { id: overId } = over as {id:string}
+    const { id: overId } = over as { id: string };
 
     const activeContainer = findContainer(id as string);
     const overContainer = findContainer(overId);
@@ -224,7 +204,11 @@ export default function Team() {
     if (activeIndex !== overIndex) {
       setItems((items) => ({
         ...items,
-        [overContainer]: arrayMove(items[overContainer], activeIndex, overIndex)
+        [overContainer]: arrayMove(
+          items[overContainer],
+          activeIndex,
+          overIndex
+        ),
       }));
     }
 

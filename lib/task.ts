@@ -23,17 +23,65 @@ type StoreTeam = {
 
     addTeam: (team: TeamMember) => void
     removeTeam: (id: string) => void
-
-    // addState: (news: string) => void
 }
 
 export const useTeamStore = create<StoreTeam>((set) => ({
     team: [],
     addTeam: (team) => set((state) => ({ team: [ ...state.team, team ] })),
     removeTeam: (id) => set((state) => ({ team: state.team.filter((team) => team.id !== id) })),
-
-    // addState: (news) => set(state => ({...state, news}))
     
+
+}))
+
+
+type StoreWhole = {
+    collection: string[]
+    unassigned: string[]
+    useState: React.Dispatch<React.SetStateAction<EachMember>>
+    addState: (news: string) => void
+    removeState: (id: string) => void
+}
+
+export type TeamWholeKeys = keyof StoreWhole
+
+
+export const useTeamState = create<StoreWhole>((set) => ({
+    unassigned: [],
+    collection: [],
+    
+    useState: (props) => {
+        if (typeof props === "object" ){
+            set((state) => ({ ...state, props }))
+        }
+        else if (typeof props === "function") {
+            set((state) => {
+                const x = props(state as any)
+                return {...state,...x }
+            })
+        }
+        
+    },
+    
+    addState: (news) => {
+        set(state => {
+            
+                const x = {...state,
+                    collection: [...state.collection, news],
+                    [news]: []
+                }
+
+                return x
+            } 
+        )
+    },
+
+    removeState: (id) => set((state) => {
+        const x = {...state, 
+            [id]: undefined, 
+            collection: state.collection.filter((news) => news !== id)
+        }
+        return (x)
+    })
 
 }))
   

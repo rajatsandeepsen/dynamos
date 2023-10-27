@@ -4,7 +4,7 @@ import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "../ui/card";
-import { PersonIcon } from "@radix-ui/react-icons";
+import { ArchiveIcon, PersonIcon, GearIcon, CheckIcon, SymbolIcon, Cross1Icon, CrossCircledIcon } from "@radix-ui/react-icons";
 import { Skeleton } from "../ui/skeleton";
 
 export function Item(props: {
@@ -29,16 +29,23 @@ export function Item(props: {
   return (
     <Card>
         <CardContent className="flex-row gap-4 space-y-0 p-4 flex items-start">
-        <PersonIcon className="mt-px h-5 w-5" />
+          {getLogo(item.progress)}
           <div className="space-y-1">
             <p className="text-sm font-medium leading-none">{item.text}</p>
-            <p className="text-sm text-muted-foreground">
-              {item.id}
-            </p>
+            <p className="text-sm text-muted-foreground"> {item.id} </p>
           </div>
         </CardContent>
     </Card>
   );
+}
+
+export function getLogo(string:Task["progress"]) {
+  return {
+    "backlog": <ArchiveIcon className="mt-px h-5 w-5 text-violet-400"/>,
+    "inProgress": <SymbolIcon  className="mt-px h-5 w-5 animate-spin text-orange-400"/>,
+    "done": <CheckIcon  className="mt-px h-5 w-5 text-green-400"/>,
+    "todo": <CrossCircledIcon  className="mt-px h-5 w-5 text-red-400"/>,
+  }[string]
 }
 
 

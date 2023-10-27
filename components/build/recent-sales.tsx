@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useTeamStore } from "@/lib/task";
+import { TeamWholeKeys, useTeamState, useTeamStore } from "@/lib/task";
 import cuid from "cuid";
 import { Button } from "../ui/button";
 import {
@@ -24,39 +24,69 @@ import {
   CardTitle,
 } from "../ui/card";
 import React, { useState } from "react";
+import { zFilter } from "@/lib/zustand";
+import { PersonIcon, TrashIcon } from "@radix-ui/react-icons";
 
 export function AllTeam() {
-  const [team, addMember] = useTeamStore((state) => [
+  const [teamData, addMember, removeMember] = useTeamStore((state) => [
     state.team,
     state.addTeam,
+    state.removeTeam
   ]);
+  
+  const [addState, teamTask, removeState] = useTeamState(state => [state.addState, 
+      zFilter<TeamWholeKeys>(state, ["collection", "useState", "addState", "removeState"]),
+      state.removeState
+    ])
 
   const newMember = (name:string) => {
-    addMember( { id: cuid(), name, tasks: [] })
+    const id = cuid()
+    addMember( { id, name, tasks: [] })
+    addState(id)
   };
+
+  const deleteMember = (id:string) => {
+
+    if (teamTask[id].length === 0) {
+      removeMember(id)
+      removeState(id)
+    } 
+
+    else {
+      alert("Member has tasks assigned")
+    }
+
+  }
+
   return (
     <Card className="col-span-2">
       <CardHeader>
         <CardTitle>All team</CardTitle>
-        <CardDescription>Total {team.length} members</CardDescription>
+        <CardDescription>Total {teamData.length} members</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-8">
-          {team.map((e) => (
-            <div className="flex items-center">
+          {teamData.map((e) => (
+            <div className="flex items-center justify-between">
+              <div className="flex gap-1 items-center">
+
               <Avatar className="h-9 w-9">
                 <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                <AvatarFallback>OM</AvatarFallback>
+                <AvatarFallback>
+                  <PersonIcon/>
+                </AvatarFallback>
               </Avatar>
               <div className="ml-4 space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  Olivia Martin
+                <p className="text-sm font-semibold">
+                  {e.name}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  olivia.martin@email.com
+                <p className="text-xs text-muted-foreground">
+                  {e.id}
                 </p>
               </div>
-              <div className="ml-auto font-medium">+$1,999.00</div>
+              </div>
+              <div className="font-medium">{teamTask[e.id].length}x tasks</div>
+              <Button variant={"destructive"} className="rounded-full w-10 p-0" onClick={()=>deleteMember(e.id)}><TrashIcon/></Button>
             </div>
           ))}
         </div>
