@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -16,13 +16,17 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
-import Container from "./team-container";
+import Container, { UnAssigned } from "./team-container";
 import { Item } from "./team-items";
+import { Card, CardFooter, CardHeader } from "../ui/card";
+import { NewTask } from "./new-task";
+import cuid from "cuid";
+import { useTaskStore, useTeamStore } from "@/lib/task";
 
 type Content = string
 
-type Items = {
-  [k in any]: Content[]
+type EachMember = {
+  [k:string]: Content[]
 }
 
 
@@ -56,14 +60,18 @@ const defaultAnnouncements = {
 };
 
 export default function Team() {
-  const [items, setItems] = useState<Items>({
-    root: ["1", "2", "3"],
-    container1: ["4", "5", "6"],
-    container2: ["7", "8", "9"],
-    container3: [],
-    container4: []
+
+  const [teams] = useTeamStore(state => [state.team])
+  const [tasks, setTask] = useTaskStore(state => [state.task, state.addTask])
+
+  const cal = {} as EachMember
+  (teams).forEach((e) => cal[e.id] = e.tasks.map(e => e.id))
+  
+  const [items, setItems] = useState<EachMember>({
+    unassigned: [],
+    ...cal
   });
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -71,6 +79,27 @@ export default function Team() {
       coordinateGetter: sortableKeyboardCoordinates
     })
   );
+
+  useEffect(() => {
+
+    
+  
+    return () => {}
+  }, [])
+
+  function AddTask(text:string){
+    const id = cuid()
+    const x = {
+      id, createdAt: Date.now().toString(),
+      progress: "todo", text, assigned: "unassigned"
+    } as Task
+    setItems((prev) => {
+      return { ...prev, unassigned: [ ...prev.unassigned, id ] }
+    })
+
+    setTask(x)
+  }
+  
 
   return (
       <DndContext
@@ -81,37 +110,51 @@ export default function Team() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <Container id="root" items={items.root} />
-        <Container id="container1" items={items.container1} />
-        <Container id="container2" items={items.container2} />
-        <Container id="container3" items={items.container3} />
-        <Container id="container4" items={items.container4} />
+        <div className="break-inside-avoid">
+          <Card className="mb-5 break-inside-avoid">
+            <CardHeader>
+              Unassigned Tasks
+            </CardHeader>
+            <UnAssigned id={"unassigned"} items={items.unassigned} />
+            <CardFooter>
+              <NewTask setTask={AddTask as any}/>
+            </CardFooter>
+          </Card>
+        </div>
+
+        {Object.entries(items).map(([key, value]) => {
+
+          if(key === "unassigned") return null
+          return  <Container id={key} items={value}  />
+
+        })}
+
         <DragOverlay>{activeId ? <Item id={activeId} /> : null}</DragOverlay>
       </DndContext>
   );
 
-  function findContainer(id:string) {
+  function findContainer(id: keyof EachMember) {
     if (id in items) {
       return id;
     }
 
-    return Object.keys(items).find((key) => items[key as keyof Items].includes(id as never));
+    return Object.keys(items).find((key) => items[key as keyof EachMember].includes(id as never));
   }
 
   function handleDragStart(event:DragStartEvent) {
     const { active } = event;
     const { id } = active;
 
-    setActiveId(id);
+    setActiveId(id as string);
   }
 
   function handleDragOver(event:DragOverEvent) {
     const { active, over } = event;
-    const { id } = active;
-    const { id: overId } = over as {id:string}
+    const { id } = active as {id:string}
+    const { id:overId } = over as {id:string}
 
     // Find the containers
-    const activeContainer = findContainer(id as string);
+    const activeContainer = findContainer(id);
     const overContainer = findContainer(overId);
 
     if (
@@ -128,7 +171,7 @@ export default function Team() {
 
       // Find the indexes for the items
       const activeIndex = activeItems.indexOf(id as never);
-      const overIndex = overItems.indexOf(overId);
+      const overIndex = overItems.indexOf(overId as any);
 
       let newIndex;
       if (overId in prev) {

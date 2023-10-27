@@ -1,7 +1,9 @@
 import { Metadata } from "next"
-import Image from "next/image"
 
-import { Button } from "@/components/ui/button"
+import { Overview } from "@/components/build/overview"
+import { AllTeam } from "@/components/build/recent-sales"
+import Self from "@/components/build/self-dnd"
+import Team from "@/components/build/team-dnd"
 import {
   Card,
   CardContent,
@@ -15,16 +17,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { CalendarDateRangePicker } from "../../components/build/date-range-picker"
-import { MainNav } from "../../components/build/main-nav"
-import { Overview } from "../../components/build/overview"
-import { AllTeam } from "../../components/build/recent-sales"
-import { Search } from "../../components/build/search"
-import TeamSwitcher from "../../components/build/team-switcher"
-import { UserNav } from "../../components/build/user-nav"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import Team from "@/components/build/team-dnd"
-import Self from "@/components/build/self-dnd"
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -55,7 +47,35 @@ export default function DashboardPage() {
             </TabsContent>
             <TabsContent value="self" className="space-y-4">
                 <div className="grid grid-cols-3 items-start sm:grid-cols-4 md:grid-cols-5 gap-4">
-                    <Card></Card>
+                  <div className="flex flex-col gap-4">
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Total tasks
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">173</div>
+                            <p className="text-xs text-muted-foreground">
+                                +20.1% from last month
+                            </p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Total tasks
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">173</div>
+                            <p className="text-xs text-muted-foreground">
+                                +20.1% from last month
+                            </p>
+                        </CardContent>
+                    </Card>
+                    </div>
                     <Self/>
                 </div>  
             </TabsContent>
@@ -88,17 +108,9 @@ export default function DashboardPage() {
                     <Overview />
                   </CardContent>
                 </Card>
-                <Card className="col-span-2">
-                  <CardHeader>
-                    <CardTitle>All team</CardTitle>
-                    <CardDescription>
-                      Total 70 members
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <AllTeam />
-                  </CardContent>
-                </Card>
+                
+                  <AllTeam/>
+              
               </div>
             </TabsContent>
           </Tabs>

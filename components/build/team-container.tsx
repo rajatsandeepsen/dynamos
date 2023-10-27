@@ -11,13 +11,15 @@ import {
 import SortableItem from "./team-items";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useTaskStore } from "@/lib/task";
 
 type ItemsProps = {
   id: string
-  items: any[]
+  items: string[]
 }
 export default function Container(props: ItemsProps) {
   const { id, items } = props;
+  const [tasks] = useTaskStore(state => [state.task])
 
   const { setNodeRef } = useDroppable({
     id,
@@ -49,11 +51,37 @@ export default function Container(props: ItemsProps) {
             {items.length === 0 && (
                 <Skeleton className="w-full h-[20px]" />
             )}
-            {items.map((id) => (
-                <SortableItem key={id} id={id} />
+            {items.map((item) => (
+                <SortableItem key={item} id={item} item={tasks.find(e=> e.id=== item) as Task}/>
             ))}
         </CardContent>
       </Card>
+    </SortableContext>
+  );
+}
+
+export function UnAssigned(props: ItemsProps) {
+  const { id, items } = props;
+  const [tasks] = useTaskStore(state => [state.task])
+
+  const { setNodeRef } = useDroppable({
+    id,
+  });
+
+  return (
+    <SortableContext
+      id={id}
+      items={items}
+      strategy={verticalListSortingStrategy}
+    >
+        <CardContent  className="flex flex-col gap-1 p-2 flex-nowrap" ref={setNodeRef}>
+            {items.length === 0 && (
+                <Skeleton className="w-full h-[20px]" />
+            )}
+            {items.map((item) => (
+                <SortableItem key={item} id={item} item={tasks.find(e=> e.id=== item) as Task} />
+            ))}
+        </CardContent>
     </SortableContext>
   );
 }
