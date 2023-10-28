@@ -35,12 +35,7 @@ export function AllTeam() {
 
   const [addState, teamTask, removeState] = useTeamState((state) => [
     state.addState,
-    zFilter<TeamWholeKeys>(state, [
-      "collection",
-      "useState",
-      "addState",
-      "removeState",
-    ]),
+    state.dam,
     state.removeState,
   ]);
 

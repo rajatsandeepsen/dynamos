@@ -57,12 +57,10 @@ export default function Team() {
   const [setTask] = useTaskStore((state) => [state.addTask]);
 
   const [items, setItems] = useTeamState((state) => {
-    const y = zFilter<TeamWholeKeys>(state, ["collection", "useState", "addState", "removeState"]);
-
-    return [y, state.useState];
+    return [state.dam, state.useState];
   });
   const [activeId, setActiveId] = useState<string | null>(null);
-
+  type Items = keyof typeof items
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -104,7 +102,7 @@ export default function Team() {
       </div>
 
       {Object.entries(items).map(([key, value]) => {
-        if (key === "unassigned") return null;
+        if (key === "unassigned" || (!value)) return null;
         return <Container id={key} items={value} />;
       })}
 
@@ -118,7 +116,7 @@ export default function Team() {
     }
 
     return Object.keys(items).find((key) =>
-      items[key as keyof EachMember].includes(id as never)
+      items[key as Items].includes(id as never)
     );
   }
 
@@ -175,7 +173,7 @@ export default function Team() {
         ],
         [overContainer]: [
           ...prev[overContainer].slice(0, newIndex),
-          items[activeContainer][activeIndex],
+          items[activeContainer as Items][activeIndex],
           ...prev[overContainer].slice(newIndex, prev[overContainer].length),
         ],
       };
@@ -198,8 +196,8 @@ export default function Team() {
       return;
     }
 
-    const activeIndex = items[activeContainer].indexOf(active.id as never);
-    const overIndex = items[overContainer].indexOf(overId as never);
+    const activeIndex = items[activeContainer as Items].indexOf(active.id as never);
+    const overIndex = items[overContainer as Items].indexOf(overId as never);
 
     if (activeIndex !== overIndex) {
       setItems((items) => ({

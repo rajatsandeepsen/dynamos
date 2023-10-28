@@ -9,14 +9,8 @@ import { useMemo } from "react";
 export function Overview() {
   const [teamData] = useTeamStore((state) => [state.team]);
 
-  const [teamTask, unassigned] = useTeamState((state) => [
-    zFilter<TeamWholeKeys>(state, [
-      "collection",
-      "useState",
-      "addState",
-      "removeState",
-    ]),
-    state.unassigned,
+  const [teamTask] = useTeamState((state) => [
+    state.dam,
   ]);
 
   let data = [
@@ -24,12 +18,12 @@ export function Overview() {
       name: key?.name,
       total: teamTask[key?.id]?.length,
     })),
-    { name: "unassigned", total: unassigned?.length },
+    { name: "unassigned", total: teamTask.unassigned?.length },
   ];
 
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <BarChart barSize={50} data={data?.length === 0 ? [{ name: "No team", total: 0 }] : data}>
+      <BarChart data={data?.length === 0 ? [{ name: "No team", total: 0 }] : data}>
         <XAxis
           dataKey="name"
           stroke="#888888"
@@ -55,15 +49,8 @@ export function Overview() {
 }
 
 export const TotalTasks = () => {
-  const [teamTask, unassigned] = useTeamState((state) => [
-    zFilter<TeamWholeKeys>(state, [
-      "collection",
-      "useState",
-      "addState",
-      "removeState",
-    ]),
-
-    state.unassigned,
+  const [teamTask] = useTeamState((state) => [
+    state.dam
   ]);
 
   const total = useMemo(
@@ -93,7 +80,7 @@ export const TotalTasks = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{unassigned.length}</div>
+          <div className="text-2xl font-bold">{teamTask.unassigned.length}</div>
           <p className="text-xs text-muted-foreground"></p>
         </CardContent>
       </Card>

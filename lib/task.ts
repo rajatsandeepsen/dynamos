@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { zFilter } from './zustand'
 
 
 
@@ -35,11 +36,14 @@ export const useTeamStore = create<StoreTeam>((set) => ({
 
 }))
 
-
+type Ommited = Omit<StoreWhole, "collection"| "useState"| "addState"| "removeState" | "getAllStates">
 type StoreWhole = {
     collection: string[]
-    unassigned: string[]
-    useState: React.Dispatch<React.SetStateAction<EachMember>>
+    dam: {
+        unassigned: string[]
+        [key: string]: string[]
+    }
+    useState: React.Dispatch<React.SetStateAction<StoreWhole["dam"]>>
     addState: (news: string) => void
     removeState: (id: string) => void
 }
@@ -47,18 +51,20 @@ type StoreWhole = {
 export type TeamWholeKeys = keyof StoreWhole
 
 
-export const useTeamState = create<StoreWhole>((set) => ({
-    unassigned: [],
+export const useTeamState = create<StoreWhole>((set, get, state) => ({
     collection: [],
+    dam: {
+        unassigned: []
+    },
     
     useState: (props) => {
         if (typeof props === "object" ){
-            set((state) => ({ ...state, props }))
+            set((state) => ({ ...state, dam: props }))
         }
         else if (typeof props === "function") {
             set((state) => {
-                const x = props(state as any)
-                return {...state,...x }
+                const x:StoreWhole["dam"] = props(state.dam)
+                return {...state, dam:x }
             })
         }
         
@@ -69,7 +75,9 @@ export const useTeamState = create<StoreWhole>((set) => ({
             
                 const x = {...state,
                     collection: [...state.collection, news],
-                    [news]: []
+                    dam: {
+                        ...state.dam, [news]: []
+                    }
                 }
 
                 return x
@@ -78,8 +86,11 @@ export const useTeamState = create<StoreWhole>((set) => ({
     },
 
     removeState: (id) => set((state) => {
+        delete state.dam[id]
         const x = {...state, 
-            [id]: undefined, 
+            dam: {
+                ...state.dam
+            },
             collection: state.collection.filter((news) => news !== id)
         }
         return (x)
