@@ -21,9 +21,9 @@ export function NewTask({setTask}:{setTask:(task:string)=>void}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Create new Task</Button>
+        <Button variant="default">Create new Task</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-card">
         <DialogHeader>
           <DialogTitle>Create new Task</DialogTitle>
           <DialogDescription>

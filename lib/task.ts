@@ -23,6 +23,7 @@ type StoreTeam = {
 
     addTeam: (team: TeamMember) => void
     removeTeam: (id: string) => void
+    promoteTeam: (id:string, data:TeamMember) => void
 }
 
 export const useTeamStore = create<StoreTeam>((set) => ({
@@ -30,6 +31,7 @@ export const useTeamStore = create<StoreTeam>((set) => ({
     addTeam: (team) => set((state) => ({ team: [ ...state.team, team ] })),
     removeTeam: (id) => set((state) => ({ team: state.team.filter((team) => team.id !== id) })),
     
+    promoteTeam: (id, data) => set((state) => ({ team: state.team.map((team) => team.id === id ? {...team, ...data} : team) })),
 
 }))
 

@@ -46,7 +46,7 @@ export default function Container(props: ItemsProps) {
             </Avatar>
             <div className="ml-4 space-y-1">
               <p className="text-base font-semibold">{data?.name}</p>
-              <p className="text-sm text-muted-foreground"> {data?.id} </p>
+              <p className="text-sm text-muted-foreground"> {data?.position} </p>
             </div>
           </div>
         </CardHeader>

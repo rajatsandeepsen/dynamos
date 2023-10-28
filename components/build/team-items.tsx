@@ -14,7 +14,7 @@ export function Item(props: {
   const { id, item } = props;
 
   if(!item) return (
-    <Card>
+    <Card className="bg-muted">
         <CardContent className="flex-row gap-4 space-y-0 p-4 flex items-start">
         <Skeleton className="mt-px h-5 w-5" />
           <div className="space-y-1">
@@ -26,13 +26,15 @@ export function Item(props: {
     </Card>
   )
 
+  const date = new Date(parseInt(item?.createdAt || "0"))
+
   return (
-    <Card>
+    <Card className="bg-muted">
         <CardContent className="flex-row gap-4 space-y-0 p-4 flex items-start">
           {getLogo(item.progress)}
           <div className="space-y-1">
             <p className="text-sm font-medium leading-none">{item.text}</p>
-            <p className="text-sm text-muted-foreground"> {item.id} </p>
+            <p className="text-sm text-muted-foreground"> {date.toLocaleDateString('en-IN')} </p>
           </div>
         </CardContent>
     </Card>

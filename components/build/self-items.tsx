@@ -20,13 +20,10 @@ export function Item(props:Props) {
   // if (item?.progress !== "backlog") return null;
 
   return (
-    <Card>
+    <Card className="bg-muted">
         <CardContent className="flex-row justify-between space-y-0 p-4 flex items-start">
-        <PersonIcon className="mt-px h-5 w-5" />
-          <div className="space-y-1">
             <p className="text-sm font-medium leading-none">{item?.text}</p>
             <p className="text-sm text-muted-foreground">{date.toLocaleDateString('en-IN')}</p>
-          </div>
         </CardContent>
     </Card>
   );

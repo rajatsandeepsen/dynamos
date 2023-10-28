@@ -12,6 +12,7 @@ type TeamMember = {
     id: string
     name: string
     tasks: Task[]
+    position: string
 }
 
 type Content = string

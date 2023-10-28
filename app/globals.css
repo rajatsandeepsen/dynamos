@@ -66,6 +66,7 @@
     @apply border-border;
   }
   body {
+    font-family: "Cal Sans";
     @apply bg-background text-foreground;
   }
 }

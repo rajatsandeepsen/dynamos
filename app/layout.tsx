@@ -2,6 +2,7 @@
 
 import AuthButton from '@/components/AuthButton'
 import './globals.css'
+import "cal-sans";
 import Navbar from '@/components/Navbar'
 
 // export const metadata = {
