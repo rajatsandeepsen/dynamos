@@ -6,6 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { PersonIcon } from "@radix-ui/react-icons";
 import { useSelfTaskWhole } from "@/lib/self";
+import { Grip } from "lucide-react";
 type Props = {
   id: string
 }
@@ -24,6 +25,7 @@ export function Item(props:Props) {
         <CardContent className="flex-row justify-between space-y-0 p-4 flex items-start">
             <p className="text-sm font-medium leading-none">{item?.text}</p>
             <p className="text-sm text-muted-foreground">{date.toLocaleDateString('en-IN')}</p>
+            <Grip className="text-muted-foreground" size={20} />
         </CardContent>
     </Card>
   );

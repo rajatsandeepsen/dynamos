@@ -9,48 +9,47 @@ import { useMemo } from "react";
 export function Overview() {
   const [teamData] = useTeamStore((state) => [state.team]);
 
-  const [teamTask] = useTeamState((state) => [
+  const [teamTask, unassigned] = useTeamState((state) => [
     zFilter<TeamWholeKeys>(state, [
       "collection",
       "useState",
       "addState",
       "removeState",
     ]),
+    state.unassigned,
   ]);
 
-  const data = teamData.map((key) => ({
-    name: key.name,
-    total: teamTask[key.id].length,
-  }));
+  let data = [
+    ...teamData.map((key) => ({
+      name: key?.name,
+      total: teamTask[key?.id]?.length,
+    })),
+    { name: "unassigned", total: unassigned?.length },
+  ];
+
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <>
-        {data.length === 0 && (
-          <div className="flex flex-col items-center justify-center space-y-2">
-            <p className="text-muted-foreground">
-              Create team and start assigning tasks
-            </p>
-          </div>
-        )}
-
-        <BarChart data={data}>
-          <XAxis
-            dataKey="name"
-            stroke="#888888"
-            fontSize={12}
-            tickLine={false}
-            axisLine={false}
-          />
-          <YAxis
-            stroke="#888888"
-            fontSize={12}
-            tickLine={false}
-            axisLine={false}
-            tickFormatter={(value) => `${value}`}
-          />
-          <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]} />
-        </BarChart>
-      </>
+      <BarChart barSize={50} data={data?.length === 0 ? [{ name: "No team", total: 0 }] : data}>
+        <XAxis
+          dataKey="name"
+          stroke="#888888"
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+        />
+        <YAxis
+          stroke="#888888"
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(value) => `${value}`}
+        />
+        <Bar
+          dataKey="total"
+          className="fill-card-foreground"
+          radius={[4, 4, 0, 0]}
+        />
+      </BarChart>
     </ResponsiveContainer>
   );
 }
@@ -64,14 +63,15 @@ export const TotalTasks = () => {
       "removeState",
     ]),
 
-    state.unassigned
+    state.unassigned,
   ]);
 
   const total = useMemo(
-    () =>
-      Object.values(teamTask)
-        .map((x) => x.length)
-        .reduce((a, b) => a + b, 0),
+    () => {
+      let total = 0
+      Object.values(teamTask).forEach((x) => total += x?.length || 0)
+      return total
+    },
     [teamTask]
   );
   return (

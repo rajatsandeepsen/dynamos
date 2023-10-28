@@ -6,6 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { ArchiveIcon, PersonIcon, GearIcon, CheckIcon, SymbolIcon, Cross1Icon, CrossCircledIcon, CheckCircledIcon } from "@radix-ui/react-icons";
 import { Skeleton } from "../ui/skeleton";
+import { Grip } from "lucide-react";
 
 export function Item(props: {
   id: string;
@@ -30,12 +31,13 @@ export function Item(props: {
 
   return (
     <Card className="bg-muted">
-        <CardContent className="flex-row gap-4 space-y-0 p-4 flex items-start">
+        <CardContent className="flex-row gap-4 px-4 py-5 flex items-start justify-center">
           {getLogo(item.progress)}
-          <div className="space-y-1">
+          <div className="">
             <p className="text-sm font-medium leading-none">{item.text}</p>
             <p className="text-sm text-muted-foreground"> {date.toLocaleDateString('en-IN')} </p>
           </div>
+          <Grip className="text-muted-foreground ms-auto mt-1" size={20} />
         </CardContent>
     </Card>
   );

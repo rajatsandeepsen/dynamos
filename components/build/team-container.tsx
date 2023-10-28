@@ -12,6 +12,7 @@ import SortableItem from "./team-items";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useTaskStore, useTeamStore } from "@/lib/task";
+import { PersonIcon } from "@radix-ui/react-icons";
 
 type ItemsProps = {
   id: string
@@ -23,7 +24,6 @@ export default function Container(props: ItemsProps) {
   const [teamData] = useTeamStore((state) => [
     state.team,
   ]);
-
 
   const { setNodeRef } = useDroppable({
     id,
@@ -42,7 +42,9 @@ export default function Container(props: ItemsProps) {
           <div className="flex items-center">
             <Avatar className="h-9 w-9">
               <AvatarImage src="/avatars/01.png" alt="Avatar" />
-              <AvatarFallback>OM</AvatarFallback>
+              <AvatarFallback>
+              <PersonIcon />
+              </AvatarFallback>
             </Avatar>
             <div className="ml-4 space-y-1">
               <p className="text-base font-semibold">{data?.name}</p>
@@ -52,10 +54,10 @@ export default function Container(props: ItemsProps) {
         </CardHeader>
 
         <CardContent  className="flex flex-col gap-2 p-2 flex-nowrap">
-            {items.length === 0 && (
+            {items?.length === 0 && (
                 <Skeleton className="w-full h-[20px]" />
             )}
-            {items.map((item) => (
+            {items?.map((item) => (
                 <SortableItem key={item} id={item} item={tasks.find(e=> e.id=== item) as Task}/>
             ))}
         </CardContent>
@@ -79,8 +81,8 @@ export function UnAssigned(props: ItemsProps) {
       strategy={verticalListSortingStrategy}
     >
         <CardContent  className="flex flex-col gap-3 p-2 flex-nowrap" ref={setNodeRef}>
-            {items.length === 0 && ( <div className="px-4">No task</div> )}
-            {items.map((item) => (
+            {items?.length === 0 && ( <div className="px-4">No task</div> )}
+            {items?.map((item) => (
                 <SortableItem key={item} id={item} item={tasks.find(e=> e.id=== item) as Task} />
             ))}
         </CardContent>

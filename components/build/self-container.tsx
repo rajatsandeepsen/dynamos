@@ -25,12 +25,6 @@ export default function Container(props: ItemsProps) {
     id,
   });
 
-  useEffect(() => {
-    localStorage.setItem(id, JSON.stringify(items))
-  
-    return () => { }
-  }, [items])
-  
 
   return (
     <SortableContext

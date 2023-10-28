@@ -16,7 +16,7 @@ import { TeamWholeKeys, useTeamState, useTeamStore } from "@/lib/task";
 import { zFilter } from "@/lib/zustand";
 import { PersonIcon } from "@radix-ui/react-icons";
 import cuid from "cuid";
-import { Trash2, UserPlus2Icon } from "lucide-react";
+import { ChevronsUp, Trash2, UserPlus2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -29,12 +29,9 @@ import {
 } from "../ui/card";
 
 export function AllTeam() {
-  const [teamData, addMember, removeMember, promoteTeam] = useTeamStore((state) => [
-    state.team,
-    state.addTeam,
-    state.removeTeam,
-    state.promoteTeam,
-  ]);
+  const [teamData, addMember, removeMember, promoteTeam] = useTeamStore(
+    (state) => [state.team, state.addTeam, state.removeTeam, state.promoteTeam]
+  );
 
   const [addState, teamTask, removeState] = useTeamState((state) => [
     state.addState,
@@ -47,9 +44,6 @@ export function AllTeam() {
     state.removeState,
   ]);
 
-  useEffect(() => {
-    localStorage.setItem("teamData", JSON.stringify(teamData))
-  }, [teamData]);
 
   const newMember = (name: string, position: string) => {
     const id = cuid();
@@ -66,7 +60,7 @@ export function AllTeam() {
     }
   };
 
-  const promoteMember = (id: string, data:any) => {
+  const promoteMember = (id: string, data: any) => {
     promoteTeam(id, data);
   };
 
@@ -79,7 +73,7 @@ export function AllTeam() {
       <CardContent>
         <div className="space-y-8">
           {teamData.map((e) => (
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-b pb-4">
               <div className="flex gap-1 items-center">
                 <Avatar className="h-9 w-9">
                   <AvatarImage src="/" alt="Avatar" />
@@ -92,7 +86,6 @@ export function AllTeam() {
                   <p className="text-xs text-muted-foreground">{e.position}</p>
                 </div>
               </div>
-              <div className="font-medium">{teamTask[e.id].length}x tasks</div>
               <div className="flex gap-1 flex-row-reverse">
                 <Button
                   variant={"destructive"}
@@ -107,20 +100,25 @@ export function AllTeam() {
                       variant={"secondary"}
                       className=" w-10 p-0 hidden sm:flex "
                     >
-                      <UserPlus2Icon size={20} />
+                      <ChevronsUp size={20} />
                     </Button>
                   </DialogTrigger>
-                  <AddMember run={(name: string, position: string) => promoteMember(e.id, {name, position}) } data={e} />
+                  <AddMember
+                    run={(name: string, position: string) =>
+                      promoteMember(e.id, { name, position })
+                    }
+                    data={e}
+                  />
                 </Dialog>
               </div>
             </div>
           ))}
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="">
         <Dialog>
           <DialogTrigger asChild>
-            <Button  className="w-full gap-2">
+            <Button className="w-full gap-2">
               Add Member <UserPlus2Icon size={20} />
             </Button>
           </DialogTrigger>
@@ -132,9 +130,11 @@ export function AllTeam() {
 }
 
 const AddMember = ({
-  run,data
+  run,
+  data,
 }: {
-  run: (name: string, position: string) => void, data?: {name: string, position: string}
+  run: (name: string, position: string) => void;
+  data?: { name: string; position: string };
 }) => {
   const [name, setName] = useState(data?.name ?? "");
   const [position, setPosition] = useState(data?.position ?? "");
